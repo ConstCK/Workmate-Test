@@ -31,18 +31,21 @@ class Breed(models.Model):
     name = models.CharField(unique=True, max_length=128, verbose_name='Порода животного')
     description = models.CharField(max_length=512, verbose_name='Описание породы', blank=True)
 
+    def __str__(self):
+        return f'Порода {self.name}'
+
     class Meta:
         verbose_name = 'Порода'
         verbose_name_plural = 'Породы'
 
 
 class Vote(models.Model):
-    value = models.PositiveSmallIntegerField(verbose_name='Оценка',
-                                             validators=[validators.MaxValueValidator(5,
-                                                                                      message='Значение должно быть от 0 до 5')])
+    value = models.PositiveSmallIntegerField(verbose_name='Оценка',)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    cat = models.ForeignKey('Cat', on_delete=models.CASCADE, related_name='vote')
+    cat = models.ForeignKey('Cat', on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f'{self.value} за {self.cat.name}'
     class Meta:
         verbose_name = 'Голос'
         verbose_name_plural = 'Голоса'
