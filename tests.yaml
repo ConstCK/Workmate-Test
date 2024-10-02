@@ -1,0 +1,7 @@
+services:
+  django:
+    build: .
+    ports:
+      - "8000:8000"
+    command: bash -c "cd cat_exhibition && python manage.py makemigrations 
+      && python manage.py migrate && python manage.py test"

@@ -39,7 +39,7 @@ class CatsViewSet(viewsets.ViewSet):
 
     # Добавление питомца
     def create(self, request):
-        cat_data = request.data
+        cat_data = request.data.copy()
         cat_data['owner'] = request.user.id
         serializer = CatSerializer(data=cat_data)
         if serializer.is_valid():
@@ -49,14 +49,14 @@ class CatsViewSet(viewsets.ViewSet):
             return Response({'error': 'Передайте все данные о питомце'}, status=status.HTTP_400_BAD_REQUEST)
 
     # Изменение данных питомца с проверкой на принадлежность
-    def update(self, request, pk=None):
+    def partial_update(self, request, pk=None):
         try:
             cat = Cat.objects.get(pk=pk)
             # Проверка на принадлежность питомца создателю запроса
             if cat.owner.id != request.user.id:
                 return Response('У Вас нет прав изменять эти данные. Животное принадлежит не Вам.',
                                 status=status.HTTP_403_FORBIDDEN)
-            cat_data = request.data
+            cat_data = request.data.copy()
             cat_data['owner'] = request.user.id
             serializer = CatSerializer(instance=cat, data=cat_data)
             if serializer.is_valid():
@@ -110,7 +110,7 @@ class VoteAPIView(APIView):
 
     # Процесс голосование за питомца
     def post(self, request, cat_id=None):
-        mark = request.data.get('value')
+        mark = int(request.data.get('value'))
         try:
             serializer = VoteSerializer(data=request.data)
             if not serializer.is_valid():
@@ -125,7 +125,8 @@ class VoteAPIView(APIView):
             cat.total_marks += mark
             cat.rating = cat.total_marks / cat.total_votes
             cat.save()
-            return Response({'message': f'Вы успешно поставили {mark} питомцу с id={cat_id}'})
+            return Response({'message': f'Вы успешно поставили {mark} питомцу с id={cat_id}'},
+                            status=status.HTTP_200_OK)
         except ValidationError:
             return Response({'error': f'Не удалось оценить питомца.Оценка должна быть от 0 до 5.'},
                             status=status.HTTP_400_BAD_REQUEST)
