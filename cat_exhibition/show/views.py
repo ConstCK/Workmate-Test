@@ -110,23 +110,22 @@ class VoteAPIView(APIView):
 
     # Процесс голосование за питомца
     def post(self, request, cat_id=None):
-        value = request.data.get('value')
-
+        mark = request.data.get('value')
         try:
-            serializer = VoteSerializer(data={'value': value})
+            serializer = VoteSerializer(data=request.data)
             if not serializer.is_valid():
                 raise ValidationError
             user = User.objects.get(pk=request.user.id)
             cat = Cat.objects.get(pk=cat_id)
             Vote.objects.create(user=user,
                                 cat=cat,
-                                value=value)
+                                value=mark)
             # Расчет нового рейтинга питомца
             cat.total_votes += 1
-            cat.total_marks += value
+            cat.total_marks += mark
             cat.rating = cat.total_marks / cat.total_votes
             cat.save()
-            return Response({'message': f'Вы успешно поставили {value} питомцу с id={cat_id}'})
+            return Response({'message': f'Вы успешно поставили {mark} питомцу с id={cat_id}'})
         except ValidationError:
             return Response({'error': f'Не удалось оценить питомца.Оценка должна быть от 0 до 5.'},
                             status=status.HTTP_400_BAD_REQUEST)
