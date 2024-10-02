@@ -18,6 +18,8 @@ class Cat(models.Model):
                               related_name='cats',
                               verbose_name='Владелец животного')
     rating = models.FloatField(default=0, verbose_name='Рейтинг животного')
+    total_marks = models.PositiveIntegerField(default=0, verbose_name='Суммарная оценка')
+    total_votes = models.PositiveIntegerField(default=0, verbose_name='Количество голосовавших')
 
     def __str__(self):
         return f'{self.name} породы {self.breed}'

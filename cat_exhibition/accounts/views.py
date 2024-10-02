@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from .serializers import UserSerializer
 
 
+# Регистрация нового пользователя с присваиванием и возвращением ему JWT токена
 class RegistrationAPIView(APIView):
 
     def post(self, request):
@@ -26,6 +27,7 @@ class RegistrationAPIView(APIView):
             }, status=status.HTTP_201_CREATED)
 
 
+# Вход зарегистрированного пользователя с возвращением ему JWT токена
 class LogInAPIView(APIView):
 
     def post(self, request):
@@ -51,6 +53,7 @@ class LogInAPIView(APIView):
         }, status=status.HTTP_200_OK)
 
 
+# Выход из аккаунта с добавлением токена в blackList
 class LogOutAPIView(APIView):
 
     def post(self, request):
