@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.http import Http404
-from drf_spectacular.utils import extend_schema, OpenApiExample, extend_schema_view, OpenApiParameter, OpenApiResponse
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiResponse
 from rest_framework import viewsets, status
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import Cat, Breed, Vote
-from .serializers import CatSerializer, BreedSerializer, VoteSerializer, SuccessResponseSerializer, \
+from .serializers import CatSerializer, CatCreationSerializer, BreedSerializer, VoteSerializer, SuccessResponseSerializer, \
     Error404ResponseSerializer, Error400ResponseSerializer, Error403ResponseSerializer
 
 
@@ -76,7 +76,7 @@ class CatsViewSet(viewsets.ViewSet):
 
     # Добавление питомца
     @extend_schema(summary='Cat data adding',
-                   request=CatSerializer,
+                   request=CatCreationSerializer,
                    responses={
                        status.HTTP_201_CREATED: OpenApiResponse(
                            response=CatSerializer,
