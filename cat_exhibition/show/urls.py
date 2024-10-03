@@ -3,7 +3,7 @@ from rest_framework import routers
 
 from .views import CatsViewSet, BreedViewSet, VoteAPIView
 router = routers.DefaultRouter()
-router.register('cats', CatsViewSet, basename='cats')
+router.register('cats', CatsViewSet, basename='cats',)
 router.register('breeds', BreedViewSet, basename='breeds')
 
 

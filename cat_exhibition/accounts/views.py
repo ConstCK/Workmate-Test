@@ -1,16 +1,29 @@
 from django.contrib.auth import authenticate
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 
-from .serializers import UserSerializer
+from .serializers import UserSerializer, LogOutSerializer, LogOutResponseSerializer, AuthResponseErrorSerializer, \
+    SignUpResponseSerializer
 
 
 # Регистрация нового пользователя с присваиванием и возвращением ему JWT токена
-class RegistrationAPIView(APIView):
 
+class RegistrationAPIView(APIView):
+    @extend_schema(tags=['Auth'],
+                   summary='User registration',
+                   request=UserSerializer,
+                   responses={
+                       status.HTTP_201_CREATED: OpenApiResponse(
+                           response=SignUpResponseSerializer,
+                           description='Успешная регистрация пользователя'),
+                       status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+                           response=AuthResponseErrorSerializer,
+                           description='Ошибка регистрации пользователя')
+                   })
     def post(self, request):
         serializer = UserSerializer(data=request.data)
 
@@ -24,11 +37,24 @@ class RegistrationAPIView(APIView):
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
             }, status=status.HTTP_201_CREATED)
+        return Response({'error': 'Неверные данные'},
+                        status=status.HTTP_400_BAD_REQUEST)
 
 
 # Вход зарегистрированного пользователя с возвращением ему JWT токена
-class LogInAPIView(APIView):
 
+class LogInAPIView(APIView):
+    @extend_schema(tags=['Auth'],
+                   summary='User login',
+                   request=UserSerializer,
+                   responses={
+                       status.HTTP_200_OK: OpenApiResponse(
+                           response=SignUpResponseSerializer,
+                           description='Успешный вход пользователя'),
+                       status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+                           response=AuthResponseErrorSerializer,
+                           description='Ошибка авторизации пользователя')}
+                   )
     def post(self, request):
         data = request.data
         username = data.get('username', None)
@@ -53,8 +79,17 @@ class LogInAPIView(APIView):
 
 
 # Выход из аккаунта с добавлением токена в blackList
-class LogOutAPIView(APIView):
 
+class LogOutAPIView(APIView):
+    @extend_schema(tags=['Auth'],
+                   summary='User logout',
+                   request=LogOutSerializer,
+                   responses={status.HTTP_200_OK: OpenApiResponse(
+                       response=LogOutResponseSerializer,
+                       description='Успешный выход'),
+                       status.HTTP_400_BAD_REQUEST: OpenApiResponse(
+                           response=AuthResponseErrorSerializer,
+                           description='Неверный refresh token')})
     def post(self, request):
         refresh_token = request.data.get('refresh_token')
         if not refresh_token:
