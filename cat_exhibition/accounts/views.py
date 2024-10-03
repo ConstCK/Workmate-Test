@@ -26,19 +26,21 @@ class RegistrationAPIView(APIView):
                    })
     def post(self, request):
         serializer = UserSerializer(data=request.data)
+        try:
+            if serializer.is_valid(raise_exception=True):
+                user = User.objects.create_user(username=request.data.get('username'))
+                user.set_password(request.data.get('password'))
+                user.save()
+                refresh = RefreshToken.for_user(user)
 
-        if serializer.is_valid(raise_exception=True):
-            user = User.objects.create_user(username=request.data.get('username'))
-            user.set_password(request.data.get('password'))
-            user.save()
-            refresh = RefreshToken.for_user(user)
+                return Response({
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                }, status=status.HTTP_201_CREATED)
 
-            return Response({
-                'refresh': str(refresh),
-                'access': str(refresh.access_token),
-            }, status=status.HTTP_201_CREATED)
-        return Response({'error': 'Неверные данные'},
-                        status=status.HTTP_400_BAD_REQUEST)
+        except Exception:
+            return Response({'error': 'Неверные данные.'},
+                            status=status.HTTP_400_BAD_REQUEST)
 
 
 # Вход зарегистрированного пользователя с возвращением ему JWT токена

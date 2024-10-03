@@ -97,6 +97,11 @@ class TestExhibition(TestCase):
         response = self.client.post(f'/{self.auth_url}signup/', self.user_data_4)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    # Проверка функции регистрации при повторе пользователя
+    def test_signup_failed_2(self):
+        response = self.client.post(f'/{self.auth_url}signup/', self.user_data_1)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
     # Проверка login функции при правильном вводе данных
     def test_login_success(self):
         response = self.client.post(f'/{self.auth_url}login/', self.user_data_1)
