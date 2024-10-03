@@ -17,20 +17,21 @@ class CatSerializer(serializers.ModelSerializer):
     owner_info = UserSerializer(read_only=True, source='owner')
     total_marks = serializers.IntegerField(read_only=True, default=0)
     total_votes = serializers.IntegerField(read_only=True, default=0)
+    rating = serializers.IntegerField(read_only=True, default=0)
     age = serializers.IntegerField(default=12)
-    owner = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Cat
         fields = '__all__'
 
+
 class CatCreationSerializer(serializers.ModelSerializer):
     age = serializers.IntegerField(default=1)
-    breed = serializers.IntegerField(default=1)
 
     class Meta:
         model = Cat
         fields = ['name', 'description', 'age', 'breed', 'color']
+
 
 class VoteSerializer(serializers.ModelSerializer):
     cat = CatSerializer(read_only=True)

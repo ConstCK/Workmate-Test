@@ -88,7 +88,8 @@ class CatsViewSet(viewsets.ViewSet):
                    )
     def create(self, request):
         cat_data = request.data.copy()
-        cat_data['owner'] = request.user.id
+        user = User.objects.get(id=request.user.id)
+        cat_data['owner'] = user.id
         serializer = CatSerializer(data=cat_data)
         if serializer.is_valid():
             serializer.save()
@@ -98,7 +99,7 @@ class CatsViewSet(viewsets.ViewSet):
 
     # Изменение данных питомца с проверкой на принадлежность
     @extend_schema(summary='Cat data changing',
-                   request=CatSerializer,
+                   request=CatCreationSerializer,
                    responses={
                        status.HTTP_201_CREATED: OpenApiResponse(
                            response=CatSerializer,
@@ -122,7 +123,7 @@ class CatsViewSet(viewsets.ViewSet):
                            type=int)
                    ]
                    )
-    def partial_update(self, request, pk: int = None):
+    def update(self, request, pk: int = None):
         try:
             cat = Cat.objects.get(id=pk)
             # Проверка на принадлежность питомца создателю запроса

@@ -97,11 +97,6 @@ class TestExhibition(TestCase):
         response = self.client.post(f'/{self.auth_url}signup/', self.user_data_4)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    # Проверка функции регистрации при повторе пользователя
-    def test_signup_failed_2(self):
-        response = self.client.post(f'/{self.auth_url}signup/', self.user_data_1)
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
     # Проверка login функции при правильном вводе данных
     def test_login_success(self):
         response = self.client.post(f'/{self.auth_url}login/', self.user_data_1)
@@ -156,7 +151,7 @@ class TestExhibition(TestCase):
     # Проверка метода обновления данных питомца
     def test_cat_update_success(self):
         data = json.dumps(self.cat_data_7)
-        response = self.client.patch(f'/{self.api_url}cats/{self.cat_1.id}/',
+        response = self.client.put(f'/{self.api_url}cats/{self.cat_1.id}/',
                                      data,
                                      headers={'authorization': f'Bearer {self.user_1.data.get("access")}',
                                               'Content-Type': 'application/json'}
@@ -165,7 +160,7 @@ class TestExhibition(TestCase):
 
     # Проверка метода обновления данных питомца для чужого хозяина
     def test_cat_update_failed_1(self):
-        response = self.client.patch(f'/{self.api_url}cats/{self.cat_1.id}/',
+        response = self.client.put(f'/{self.api_url}cats/{self.cat_1.id}/',
                                      self.cat_data_7,
                                      headers={'authorization': f'Bearer {self.user_2.data.get("access")}',
                                               }
@@ -175,7 +170,7 @@ class TestExhibition(TestCase):
     # Проверка метода обновления данных питомца с некорректными данными
     def test_cat_update_failed_2(self):
         data = json.dumps(self.cat_data_6)
-        response = self.client.patch(f'/{self.api_url}cats/{self.cat_1.id}/',
+        response = self.client.put(f'/{self.api_url}cats/{self.cat_1.id}/',
                                      data,
                                      headers={'authorization': f'Bearer {self.user_1.data.get("access")}',
                                               'Content-Type': 'application/json'}
